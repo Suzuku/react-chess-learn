@@ -88,7 +88,8 @@ class Game extends React.Component {
                     squareArr: resultArr,
                 },
             ]),
-            nextFlag: !this.state.nextFlag,
+            // 可以根据当前步骤的奇偶性来判断下一个对手
+            nextFlag: (this.state.history.length)%2===0,
         })
     }
     // 实现跳步 实际上就是把当前的history赋值为步骤对应的history
@@ -96,6 +97,7 @@ class Game extends React.Component {
         let result = this.state.history.splice(0, move + 1)
         this.setState({
             history: result,
+            nextFlag:move%2===0
         })
     }
     render() {
