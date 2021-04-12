@@ -68,6 +68,8 @@ class Game extends React.Component {
             nextFlag: true,
             // 当前的坐标
             currentPoint: [],
+            // 当前历史记录排序是否为升序
+            isHistoryAscending: true,
         };
     }
     // 再次状态提升
@@ -102,20 +104,24 @@ class Game extends React.Component {
             currentPoint: currentPointResult,
         });
     }
+    // 切换升序降序
+    changeOrder() {
+        this.setState((state)=>({ isHistoryAscending:!state.isHistoryAscending }));
+    }
     render() {
         let currentSquare = this.state.history[this.state.history.length - 1].squareArr;
         let winner = calculateWinner(currentSquare);
         const status = winner ? `The winner is ${winner}` : `Next player: ${this.state.nextFlag ? "X" : "O"}`;
-        const moves = this.state.history.map((step, move) => {
+        // 降序
+        const moves =  this.state.history.map((step, move) => {
+            move=this.state.isHistoryAscending?move:this.state.history.length - 1-move
             const desc = move ? "Go to move #" + move : "Go to game start";
             // 判断坐标进行加粗
-            const bold = move === this.state.history.length - 1 ? <strong>{desc}</strong> : desc;
+            const bold = move ===  this.state.history.length - 1 ? <strong>{desc}</strong> : desc;
             return (
                 <li key={move}>
                     <button onClick={() => this.jumpTo(move)}>{bold}</button>
-                    <span>
-                        ---------这一步的坐标是({`${calcRowPoint(this.state.currentPoint[move - 1])[0]},${calcRowPoint(this.state.currentPoint[move - 1])[1]}`})
-                    </span>
+                    <span>---------这一步的坐标是({`${calcRowPoint(this.state.currentPoint[move - 1])[0]},${calcRowPoint(this.state.currentPoint[move - 1])[1]}`})</span>
                 </li>
             );
         });
@@ -131,7 +137,16 @@ class Game extends React.Component {
                     />
                 </div>
                 <div className="game-info">
-                    <div>{status}</div>
+                    <div>
+                        {status}------
+                        <button
+                            onClick={() => {
+                                this.changeOrder();
+                            }}
+                        >
+                            历史记录{this.state.isHistoryAscending ? "升序" : "降序"}排列
+                        </button>
+                    </div>
                     <ol>{moves}</ol>
                 </div>
             </div>
