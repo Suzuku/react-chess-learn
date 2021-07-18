@@ -33,7 +33,9 @@ ul {
     width: 34px;
     cursor: pointer;
 }
-
+.red{
+    color:red
+}
 .square:focus {
     outline: none;
 }

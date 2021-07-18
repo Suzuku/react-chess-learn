@@ -12,7 +12,7 @@ class Square extends React.Component {
     render() {
         return (
             <button
-                className="square"
+                className={this.props.className}
                 onClick={() => {
                     this.props.onClick();
                 }}
@@ -31,6 +31,7 @@ class Board extends React.Component {
                 onClick={() => {
                     this.props.onClick(i);
                 }}
+                className={this.props.point.includes(i)?'red square':'square'}
             />
         );
     }
@@ -75,7 +76,7 @@ class Game extends React.Component {
     // 再次状态提升
     handleClick(i) {
         let currentSquare = this.state.history[this.state.history.length - 1].squareArr;
-        if (currentSquare[i] || calculateWinner(currentSquare)) {
+        if (currentSquare[i] || calculateWinner(currentSquare)?.winner) {
             return;
         }
         console.log(i, this.state);
@@ -110,7 +111,8 @@ class Game extends React.Component {
     }
     render() {
         let currentSquare = this.state.history[this.state.history.length - 1].squareArr;
-        let winner = calculateWinner(currentSquare);
+        const winnerResult=calculateWinner(currentSquare)       
+        const winner = winnerResult?.winner;
         const status = winner ? `The winner is ${winner}` : `Next player: ${this.state.nextFlag ? "X" : "O"}`;
         // 降序
         const moves =  this.state.history.map((step, move) => {
@@ -134,6 +136,7 @@ class Game extends React.Component {
                         onClick={(i) => {
                             this.handleClick(i);
                         }}
+                        point={winnerResult?.point || []}
                     />
                 </div>
                 <div className="game-info">
@@ -167,7 +170,11 @@ function calculateWinner(squares) {
     for (let i = 0; i < lines.length; i++) {
         const [a, b, c] = lines[i];
         if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-            return squares[a];
+        
+            return {
+                winner:squares[a],
+                point:[a,b,c]
+            }
         }
     }
     return null;
@@ -182,4 +189,5 @@ function calcRowPoint(point) {
     let line = point % 3;
     return [line, row];
 }
+
 export default Game;

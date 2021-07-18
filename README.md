@@ -1,6 +1,11 @@
 
 # react官网井字棋练习
 代码在`src/components`
+### 博客
+[react 官网井字棋进阶功能分析](https://blog.csdn.net/qq_36620428/article/details/115609628)
+### 项目运行步骤
+1. `yarn`
+2. `yarn start`
 #### 基础功能代码展示
 按照官网的一步步走下来，多次状态提升后，将`state`提到了最上层的`Game`组件进行管理，那么底下的子组件全都是受控组件 不拥有自己的`state`,代码如下：
 
@@ -264,6 +269,50 @@ function calcRowPoint(point) {
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210412130619772.png)
 
 ##### 5.每当有人获胜时，高亮显示连成一线的 3 颗棋子。
-todo
+1. 先分析下，这个效果的关键是如何输出赢的那方连着一条线的三个棋子的坐标，由于官方已经提供了`calculateWinner()`来计算出胜者，实际上仔细观察这个方法，他也可以算出连成一线的棋子，所以只要稍微改动下`return`的结果即可：
+
+```javascript
+function calculateWinner(squares) {
+    const lines = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+    ];
+    for (let i = 0; i < lines.length; i++) {
+        const [a, b, c] = lines[i];
+        if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+            return {
+                winner:squares[a],
+                point:[a,b,c]
+            }
+        }
+    }
+    return null;
+}
+```
+此时的`point`数组即为棋子坐标
+
+2. 拿到棋子坐标后，只需要把这个值传到子组件里，并且在子组件里对于坐标的样式做一个判断即可：
+
+```javascript
+    renderSquare(i) {
+        return (
+            <Square
+                value={this.props.square[i]}
+                onClick={() => {
+                    this.props.onClick(i);
+                }}
+                className={this.props.point.includes(i)?'red square':'square'}
+            />
+        );
+    }
+```
+效果如下：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210718223256294.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM2NjIwNDI4,size_16,color_FFFFFF,t_70)
 ##### 6.当无人获胜时，显示一个平局的消息。
 todo
