@@ -315,4 +315,52 @@ function calculateWinner(squares) {
 效果如下：
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210718223256294.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM2NjIwNDI4,size_16,color_FFFFFF,t_70)
 ##### 6.当无人获胜时，显示一个平局的消息。
-todo
+在九宫格的规则下，平局条件即为九宫格占满且没有胜者。所以在`render`函数加一层判断即可
+
+```javascript
+let currentSquare = this.state.history[this.state.history.length - 1].squareArr;
+    const winnerResult = calculateWinner(currentSquare);
+    const winner = winnerResult?.winner;
+    const status = winner ? `The winner is ${winner}` : `Next player: ${this.state.nextFlag ? 'X' : 'O'}`;
+    let tieResult = false;
+    // 判断平局 条件即为九宫格占满且没有胜者
+    if (currentSquare.every((item) => item) && !winner) {
+      tieResult = true;
+    }
+```
+渲染的时候做个判断渲染：
+
+```javascript
+    return (
+      <div className="game">
+        <div className="game-board">
+          <Board
+            t="1"
+            square={currentSquare}
+            onClick={(i) => {
+              this.handleClick(i);
+            }}
+            point={winnerResult?.point || []}
+          />
+        </div>
+        <div className="game-info">
+          <div>
+            {status}------
+            <button
+              onClick={() => {
+                this.changeOrder();
+              }}
+            >
+              历史记录{this.state.isHistoryAscending ? '升序' : '降序'}排列
+            </button>
+          </div>
+          <ol>{moves}</ol>
+        </div>
+        {tieResult && (
+          <div>
+            <h1>平局</h1>
+          </div>
+        )}
+      </div>
+    );
+```
